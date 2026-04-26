@@ -35,7 +35,7 @@ export default function CoursesPage() {
             const cs = getCourseStyle(c.color);
             const count = aCount[c.id] || 0;
             return (
-              <Link key={c.id} href={`/courses/${c.id}/syllabus`} style={{
+              <Link key={c.id} href={`/courses/syllabus?id=${c.id}`} style={{
                 display: 'flex', background: 'var(--surface)',
                 border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden',
                 textDecoration: 'none',

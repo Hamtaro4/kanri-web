@@ -126,7 +126,7 @@ export default function DashboardPage() {
               {todayCourses.map(({ course, period, start, end }, idx) => {
                 const cs = getCourseStyle(course.color);
                 return (
-                  <Link key={`${course.id}-${period}`} href={`/courses/${course.id}/syllabus`} style={{
+                  <Link key={`${course.id}-${period}`} href={`/courses/syllabus?id=${course.id}`} style={{
                     display: 'flex', gap: 0, background: 'var(--surface)',
                     border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden',
                     cursor: 'pointer', textDecoration: 'none',

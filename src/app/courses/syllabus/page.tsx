@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCourses } from '@/hooks/useCourses';
 import { useSyllabus } from '@/hooks/useSyllabus';
 import { getCourseStyle } from '@/lib/constants';
@@ -75,9 +74,10 @@ function SyllabusEntryForm({ initial, onSubmit, onDelete, onCancel }: {
   );
 }
 
-export default function SyllabusPage({ params }: { params: Promise<{ courseId: string }> }) {
-  const { courseId } = use(params);
+function SyllabusContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get('id') ?? '';
   const { courses } = useCourses();
   const { getEntries, addEntry, updateEntry, deleteEntry } = useSyllabus();
   const course = courses.find((c) => c.id === courseId);
@@ -123,7 +123,6 @@ export default function SyllabusPage({ params }: { params: Promise<{ courseId: s
       />
 
       <div style={{ padding: '0 16px' }}>
-        {/* Course info chip */}
         <div style={{
           background: cs.tint, border: `1px solid ${cs.border}`,
           borderLeft: `4px solid ${cs.bar}`,
@@ -147,7 +146,6 @@ export default function SyllabusPage({ params }: { params: Promise<{ courseId: s
           </div>
         </div>
 
-        {/* Section header */}
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '0 4px', marginBottom: 12 }}>
           <h2 style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-ter)', margin: 0 }}>週ごとの内容</h2>
         </div>
@@ -162,14 +160,12 @@ export default function SyllabusPage({ params }: { params: Promise<{ courseId: s
           </div>
         ) : (
           <div style={{ position: 'relative' }}>
-            {/* Timeline line */}
             <div style={{ position: 'absolute', left: 15, top: 8, bottom: 8, width: 1, background: 'var(--border)' }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {sorted.map((entry, idx) => {
                 const isCurrent = idx === 0;
                 return (
                   <div key={entry.id} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                    {/* Circle */}
                     <div style={{
                       width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
                       background: isCurrent ? cs.bar : 'var(--surface)',
@@ -179,7 +175,6 @@ export default function SyllabusPage({ params }: { params: Promise<{ courseId: s
                       fontSize: 12, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace",
                       position: 'relative', zIndex: 1,
                     }}>{entry.weekNumber}</div>
-                    {/* Card */}
                     <div onClick={() => setEditEntryId(entry.id)} style={{
                       flex: 1, background: 'var(--surface)', cursor: 'pointer',
                       border: `1px solid ${isCurrent ? cs.border : 'var(--border)'}`,
@@ -226,5 +221,13 @@ export default function SyllabusPage({ params }: { params: Promise<{ courseId: s
         )}
       </Modal>
     </>
+  );
+}
+
+export default function SyllabusPage() {
+  return (
+    <Suspense>
+      <SyllabusContent />
+    </Suspense>
   );
 }
