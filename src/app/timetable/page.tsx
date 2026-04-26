@@ -24,21 +24,25 @@ export default function TimetablePage() {
       <CourseSlotModal
         slot={selectedSlot}
         course={selectedCourse}
+        courses={courses}
         templates={templates}
         onAddCourse={(data, slot) => {
-          // Check if there's already a course for this slot; if so, add slot to it or create new
           addCourse({ ...data, slots: [slot] });
         }}
         onUpdateCourse={(id, data) => updateCourse(id, data)}
         onDeleteCourse={(id) => {
           const course = courses.find((c) => c.id === id);
           if (!course || !selectedSlot) return;
-          // If course has only this slot, delete entirely; otherwise remove slot
           const remaining = course.slots.filter(
             (s) => !(s.day === selectedSlot.day && s.period === selectedSlot.period),
           );
           if (remaining.length === 0) deleteCourse(id);
           else updateCourse(id, { slots: remaining });
+        }}
+        onAddSlotToCourse={(courseId, slot) => {
+          const course = courses.find((c) => c.id === courseId);
+          if (!course) return;
+          updateCourse(courseId, { slots: [...course.slots, slot] });
         }}
         onSaveTemplate={(data) => addTemplate(data)}
         onClose={() => setSelectedSlot(null)}
