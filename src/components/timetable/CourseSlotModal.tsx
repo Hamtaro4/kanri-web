@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Course, CourseTemplate, ScheduleSlot } from '@/types';
 import { DAYS, PERIODS, COURSE_COLOR_KEYS, getCourseStyle } from '@/lib/constants';
 import Modal from '@/components/ui/Modal';
@@ -44,6 +44,46 @@ function ColorPicker({ value, onChange }: { value: string; onChange: (c: string)
         );
       })}
     </div>
+  );
+}
+
+function SaveTemplateButton({ onSave }: { onSave: () => void }) {
+  const [saved, setSaved] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleClick = () => {
+    onSave();
+    setSaved(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <button type="button" onClick={handleClick} style={{
+      width: '100%', marginTop: 10, height: 44, borderRadius: 10,
+      border: saved ? '1px solid var(--ok)' : 0,
+      background: saved ? 'var(--ok-bg)' : 'transparent',
+      color: saved ? 'var(--ok)' : 'var(--text-sec)',
+      fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+      transition: 'background 0.2s, color 0.2s',
+    }}>
+      {saved ? (
+        <>
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 13l4 4L19 7" />
+          </svg>
+          保存しました
+        </>
+      ) : (
+        <>
+          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><path d="M17 21v-8H7v8M7 3v5h8" />
+          </svg>
+          テンプレートとして保存
+        </>
+      )}
+    </button>
   );
 }
 
@@ -134,17 +174,9 @@ function CourseFormBody({
       </div>
 
       {isEdit && onSaveTemplate && (
-        <button type="button" onClick={() => onSaveTemplate({ name, teacher, room, color })} style={{
-          width: '100%', marginTop: 10, height: 44, borderRadius: 10, border: 0,
-          background: 'transparent', color: 'var(--text-sec)', fontSize: 14, fontWeight: 600,
-          cursor: 'pointer', fontFamily: 'inherit',
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-        }}>
-          <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" /><path d="M17 21v-8H7v8M7 3v5h8" />
-          </svg>
-          テンプレートとして保存
-        </button>
+        <SaveTemplateButton
+          onSave={() => onSaveTemplate({ name, teacher, room, color })}
+        />
       )}
     </form>
   );

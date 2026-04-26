@@ -11,7 +11,7 @@ import CourseSlotModal from '@/components/timetable/CourseSlotModal';
 
 export default function TimetablePage() {
   const { courses, addCourse, updateCourse, deleteCourse, getCourseForSlot } = useCourses();
-  const { templates, addTemplate } = useTemplates();
+  const { templates, upsertTemplate } = useTemplates();
   const { assignments } = useAssignments();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
 
@@ -44,7 +44,7 @@ export default function TimetablePage() {
           if (!course) return;
           updateCourse(courseId, { slots: [...course.slots, slot] });
         }}
-        onSaveTemplate={(data) => addTemplate(data)}
+        onSaveTemplate={(data) => upsertTemplate(data)}
         onClose={() => setSelectedSlot(null)}
       />
     </>

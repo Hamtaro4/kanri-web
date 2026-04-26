@@ -14,9 +14,19 @@ export function useTemplates() {
     return template;
   };
 
+  // Replace existing template with same name, or add new one (1 per course)
+  const upsertTemplate = (data: Omit<CourseTemplate, 'id'>) => {
+    const existing = templates.find((t) => t.name === data.name);
+    if (existing) {
+      setTemplates(templates.map((t) => t.id === existing.id ? { ...t, ...data } : t));
+      return existing;
+    }
+    return addTemplate(data);
+  };
+
   const deleteTemplate = (id: string) => {
     setTemplates(templates.filter((t) => t.id !== id));
   };
 
-  return { templates, addTemplate, deleteTemplate };
+  return { templates, addTemplate, upsertTemplate, deleteTemplate };
 }
